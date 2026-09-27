@@ -1,0 +1,9 @@
+# Large data files
+*.arff
+*.csv
+
+# Cache and temporary folders
+catboost_info/
+.ipynb_checkpoints/
+__pycache__/
+.DS_Store
