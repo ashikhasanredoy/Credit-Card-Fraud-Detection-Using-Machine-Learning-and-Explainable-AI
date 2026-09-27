@@ -2,680 +2,751 @@
 
 ## Project Overview
 
-This project focuses on detecting fraudulent credit card transactions using Machine Learning and Explainable AI (XAI).
+This project develops a machine learning system for detecting fraudulent credit card transactions. Since fraud detection is a highly imbalanced classification problem, the project focuses not only on overall accuracy but also on **precision, recall, F1-score, ROC-AUC, and confusion matrix analysis**.
 
-Credit card fraud detection is a highly imbalanced binary classification problem where fraudulent transactions represent only a very small portion of all transactions. Therefore, this project focuses not only on overall accuracy but also on **Precision, Recall, F1-Score, ROC-AUC, and PR-AUC**.
-
-The project evaluates multiple machine learning algorithms, handles class imbalance using **SMOTE-Tomek**, performs hyperparameter optimization and ensemble learning, and uses **SHAP** to explain model predictions.
-
----
-
-## Dataset
-
-The dataset contains **284,807 credit card transactions** with **31 columns**.
-
-### Features
-
-| Feature      | Description                                                    |
-| ------------ | -------------------------------------------------------------- |
-| `Time`       | Time elapsed between the transaction and the first transaction |
-| `V1` – `V28` | PCA-transformed numerical features                             |
-| `Amount`     | Transaction amount                                             |
-| `Class`      | Target variable                                                |
-
-### Target Variable
-
-The `Class` column represents whether a transaction is fraudulent.
-
-```text
-0 → Legitimate Transaction
-1 → Fraudulent Transaction
-```
-
-### Input and Target Separation
-
-```python
-X = df.drop(columns=['Class'])
-y = df['Class']
-```
-
-Here:
-
-* `X` contains the input features.
-* `y` contains the target variable.
+Multiple machine learning algorithms are trained and compared, followed by hyperparameter optimization, ensemble learning, class-imbalance handling using **SMOTE-Tomek**, and model explainability using **SHAP**.
 
 ---
 
 # Machine Learning Pipeline
 
 ```text
-                         ┌─────────────────────┐
-                         │       Dataset       │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │    Data Cleaning    │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Exploratory Data    │
-                         │      Analysis       │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Feature Identification│
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │   Train-Test Split  │
-                         │       80 / 20       │
-                         └──────────┬──────────┘
-                                    │
-                  ┌─────────────────┴─────────────────┐
-                  ↓                                   ↓
-       ┌─────────────────────┐             ┌─────────────────────┐
-       │    Preprocessing    │             │ Class Imbalance     │
-       │                     │             │     Handling         │
-       │ Imputation          │             │                     │
-       │ Scaling             │             │ Original             │
-       │ Encoding            │             │ SMOTE-Tomek          │
-       └──────────┬──────────┘             └──────────┬──────────┘
-                  └─────────────────┬─────────────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │   Baseline Models  │
-                         └──────────┬──────────┘
-                                    ↓
-              ┌──────────┬──────────┼──────────┬──────────┬──────────┐
-              ↓          ↓          ↓          ↓          ↓          ↓
-             LR         DT         RF       XGBoost   LightGBM   CatBoost
-              └──────────┴──────────┴──────────┴──────────┴──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Cross-Validation    │
-                         │    Stratified CV    │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Performance         │
-                         │ Evaluation          │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Model / Experiment  │
-                         │     Selection       │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Hyperparameter      │
-                         │   Optimization      │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │    Tuned Model      │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Ensemble Learning   │
-                         ├─────────────────────┤
-                         │ Voting              │
-                         │ Stacking            │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Final Comparison    │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Final Model         │
-                         │    Selection        │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │   Test Evaluation   │
-                         └──────────┬──────────┘
-                                    ↓
-              ┌─────────────────────┼─────────────────────┐
-              ↓                     ↓                     ↓
-       Confusion Matrix          ROC-AUC                PR-AUC
-              ↓                                           ↓
-          Precision                                    Recall
-                                                        ↓
-                                                       F1
-                                    ↓
-                         ┌─────────────────────┐
-                         │ SHAP Explainability │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Feature Importance │
-                         └──────────┬──────────┘
-                                    ↓
-                         ┌─────────────────────┐
-                         │ Final Conclusions   │
-                         └─────────────────────┘
-```
-
----
-
-# 1. Dataset Loading
-
-The dataset is loaded from an ARFF file and converted into a Pandas DataFrame.
-
-```python
-from scipy.io import arff
-import pandas as pd
-
-data, meta = arff.loadarff("dataset.arff")
-
-df = pd.DataFrame(data)
-```
-
-If the dataset contains byte strings, they are decoded before further processing.
-
----
-
-# 2. Data Cleaning
-
-The dataset is checked for:
-
-* Missing values
-* Duplicate records
-* Incorrect data types
-* Invalid values
-
-The target column is:
-
-```python
-Class
-```
-
-The input and target variables are separated using:
-
-```python
-X = df.drop(columns=['Class'])
-y = df['Class']
-```
-
----
-
-# 3. Exploratory Data Analysis
-
-EDA is performed to understand the dataset before model training.
-
-The analysis includes:
-
-* Dataset shape
-* Data types
-* Missing values
-* Duplicate records
-* Class distribution
-* Numerical feature statistics
-* Feature distributions
-* Outlier analysis
-* Correlation analysis
-* Fraud vs legitimate transaction comparison
-
-Because fraud is rare, class distribution is particularly important.
-
----
-
-# 4. Feature Identification
-
-The dataset contains:
-
-```text
-Time
-V1
-V2
-...
-V28
-Amount
-```
-
-These features are used as input variables.
-
-The target variable is:
-
-```text
-Class
-```
-
-Therefore:
-
-```python
-X = df.drop(columns=['Class'])
-y = df['Class']
-```
-
----
-
-# 5. Train-Test Split
-
-The dataset is divided into training and testing sets.
-
-```python
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.20,
-    random_state=42,
-    stratify=y
-)
-```
-
-The `stratify=y` parameter preserves the class distribution between the training and testing sets.
-
-The test set is kept separate for final model evaluation.
-
----
-
-# 6. Preprocessing
-
-A preprocessing pipeline is created for the numerical and categorical features.
-
-### Numerical Features
-
-Numerical preprocessing includes:
-
-```text
-Missing Value Imputation
-        ↓
-Median
-        ↓
-Robust Scaling
-```
-
-RobustScaler is useful when numerical variables contain outliers.
-
-### Categorical Features
-
-Categorical preprocessing includes:
-
-```text
-Missing Value Imputation
-        ↓
-Most Frequent Value
-        ↓
-One-Hot Encoding
-```
-
-All preprocessing operations are placed inside the machine learning pipeline to reduce the risk of data leakage.
-
----
-
-# 7. Class Imbalance Handling
-
-Fraud detection contains a highly imbalanced target distribution.
-
-Two experimental settings are considered:
-
-### Original Dataset
-
-The original training data is used without synthetic oversampling.
-
-### SMOTE-Tomek
-
-SMOTE generates synthetic minority-class samples while Tomek Links removes overlapping or ambiguous samples.
-
-```text
-Original Training Data
-          ↓
-        SMOTE
-          ↓
-Synthetic Fraud Samples
-          ↓
-      Tomek Links
-          ↓
-Cleaned Balanced Training Data
-```
-
-SMOTE-Tomek is applied only to the training data through an `imblearn` pipeline.
-
----
-
-# 8. Baseline Models
-
-Six machine learning algorithms are evaluated:
-
-### Logistic Regression
-
-A linear classification algorithm used as a baseline.
-
-### Decision Tree
-
-A tree-based model that learns decision rules from the features.
-
-### Random Forest
-
-An ensemble of multiple decision trees.
-
-### XGBoost
-
-A gradient boosting algorithm based on sequential decision trees.
-
-### LightGBM
-
-A gradient boosting framework optimized for efficient tree-based learning.
-
-### CatBoost
-
-A gradient boosting algorithm designed to provide strong performance with minimal preprocessing.
-
----
-
-# 9. Cross-Validation
-
-Stratified K-Fold Cross-Validation is used to evaluate model performance on the training data.
-
-```text
-Training Data
-     ↓
- ┌───┴───┐
- │       │
-Fold 1  Fold 2 ... Fold 5
- │       │
- └───┬───┘
-     ↓
-Average CV Performance
-```
-
-Using stratification helps preserve the minority fraud class in each fold.
-
----
-
-# 10. Performance Evaluation
-
-Multiple metrics are used because accuracy alone is not sufficient for fraud detection.
-
-### Accuracy
-
-Measures the proportion of correctly classified transactions.
-
-### Precision
-
-Measures how many transactions predicted as fraud are actually fraudulent.
-
-```text
-Precision = TP / (TP + FP)
-```
-
-### Recall
-
-Measures how many actual fraudulent transactions are detected.
-
-```text
-Recall = TP / (TP + FN)
-```
-
-Recall is particularly important because missing fraudulent transactions can be costly.
-
-### F1-Score
-
-The harmonic mean of Precision and Recall.
-
-```text
-F1 = 2 × Precision × Recall / (Precision + Recall)
-```
-
-### ROC-AUC
-
-Measures the model's ability to distinguish between fraudulent and legitimate transactions across classification thresholds.
-
-### PR-AUC
-
-Average Precision / PR-AUC focuses on the Precision-Recall relationship and is especially informative for highly imbalanced classification problems.
-
----
-
-# 11. Model Selection
-
-Model selection is performed using predefined performance criteria from the training-set cross-validation results.
-
-For a highly imbalanced fraud detection problem, PR-AUC, Recall, Precision, and F1-Score are considered important evaluation metrics.
-
-The test set should not be used repeatedly for model selection.
-
----
-
-# 12. Hyperparameter Optimization
-
-After selecting the model/experiment configuration using training-set cross-validation, hyperparameters are optimized using `RandomizedSearchCV`.
-
-The optimization uses:
-
-```text
-5-Fold Stratified Cross-Validation
-```
-
-The scoring metric can be:
-
-```python
-scoring="average_precision"
-```
-
-This allows the optimization process to focus on Precision-Recall performance.
-
----
-
-# 13. Tuned Model
-
-The best hyperparameters obtained from cross-validation are used to train the optimized model.
-
-The tuned model is then evaluated against the ensemble models.
-
----
-
-# 14. Ensemble Learning
-
-Two ensemble learning methods are implemented.
-
-## Voting Ensemble
-
-Voting combines predictions from multiple models.
-
-```text
-XGBoost
-   │
-LightGBM ───→ Voting Ensemble
-   │
-Random Forest
-```
-
-Soft voting combines predicted probabilities from the individual models.
-
----
-
-## Stacking Ensemble
-
-Stacking uses multiple base models and a meta-model.
-
-```text
-XGBoost ───────┐
-               │
-Random Forest ─┼──→ Logistic Regression
-               │       Meta Model
-LightGBM ──────┘
-```
-
-The base models generate predictions that are passed to the meta-model.
-
----
-
-# 15. Final Model Comparison
-
-The following configurations are compared:
-
-```text
-Baseline Models
-       ↓
-SMOTE-Tomek Models
-       ↓
-Tuned Model
-       ↓
-Voting Ensemble
-       ↓
-Stacking Ensemble
-```
-
-The comparison includes:
-
-* Precision
-* Recall
-* F1-Score
-* ROC-AUC
-* PR-AUC
-
----
-
-# 16. Final Model Selection
-
-The final model is selected using the predefined evaluation criterion based on training-set cross-validation results.
-
-The test set remains untouched until the final evaluation.
-
----
-
-# 17. Final Test Evaluation
-
-After the final model has been selected, it is evaluated on the untouched test set.
-
-The main evaluation includes:
-
-```text
-Confusion Matrix
-Precision
-Recall
-F1-Score
-ROC-AUC
-PR-AUC
-```
-
----
-
-# 18. Confusion Matrix
-
-The confusion matrix contains four values:
-
-```text
-                 Predicted
-                0        1
-Actual  0      TN       FP
-        1      FN       TP
-```
-
-Where:
-
-* **TN** = True Negative
-* **FP** = False Positive
-* **FN** = False Negative
-* **TP** = True Positive
-
-For fraud detection, the number of **False Negatives** is particularly important because they represent fraudulent transactions that were not detected.
-
----
-
-# 19. SHAP Explainability
-
-SHAP (SHapley Additive exPlanations) is used to explain model predictions.
-
-SHAP helps answer:
-
-```text
-Why did the model classify this transaction as fraud?
-```
-
-It provides information about how individual features contribute to predictions.
-
----
-
-# 20. Feature Importance
-
-SHAP feature importance can be used to identify the features that have the greatest influence on model predictions.
-
-The analysis can provide:
-
-* Global feature importance
-* Positive/negative feature contribution
-* Individual transaction explanations
-
-For an ensemble final model, SHAP should be interpreted carefully. A tree-based component can be explained directly with `TreeExplainer`, while explaining the complete ensemble requires an appropriate model-agnostic SHAP approach.
-
----
-
-# 21. Research Methodology Summary
-
-The complete methodology is:
-
-```text
 Dataset
    ↓
-Data Cleaning
+Load ARFF Dataset
    ↓
-Exploratory Data Analysis
+Convert to Pandas DataFrame
    ↓
 Feature Identification
    ↓
+Data Preprocessing (Median Imputation + Robust Scaling)
+   ↓
 Train-Test Split
    ↓
-Preprocessing
+Baseline Model Training
    ↓
-Class Imbalance Experiments
-   ├── Original
-   └── SMOTE-Tomek
+Model Evaluation
    ↓
-Baseline Models
-   ├── Logistic Regression
-   ├── Decision Tree
-   ├── Random Forest
-   ├── XGBoost
-   ├── LightGBM
-   └── CatBoost
-   ↓
-Stratified Cross-Validation
-   ↓
-Performance Evaluation
-   ↓
-Model / Experiment Selection
+Best Model Selection
    ↓
 Hyperparameter Optimization
    ↓
 Tuned Model
    ↓
 Ensemble Learning
-   ├── Voting
+   ├── Soft Voting
    └── Stacking
    ↓
-Final Comparison
+SMOTE-Tomek
+   ↓
+Final Model Comparison
    ↓
 Final Model Selection
    ↓
-Untouched Test Set Evaluation
-   ↓
 Confusion Matrix
    ↓
-ROC-AUC
-   ↓
-PR-AUC
-   ↓
-Precision / Recall / F1
-   ↓
 SHAP Explainability
-   ↓
-Feature Importance
-   ↓
-Final Conclusions
 ```
 
 ---
 
-# 22. Technologies Used
+# 1. Dataset Loading
+
+The dataset is loaded from an ARFF file using SciPy.
+
+```python
+from scipy.io import arff
+
+data, meta = arff.loadarff("dataset.arff")
+df = pd.DataFrame(data)
+```
+
+### What is ARFF?
+
+**ARFF (Attribute-Relation File Format)** is a dataset format commonly used with the WEKA machine learning platform.
+
+The `loadarff()` function loads both:
+
+* Dataset values
+* Dataset metadata
+
+The loaded data is then converted into a Pandas DataFrame for easier preprocessing and analysis.
+
+---
+
+# 2. Data Preprocessing
+
+The dataset consists entirely of numerical features (`Time`, `V1`–`V28`, and `Amount`). The numerical preprocessing pipeline handles missing values and scaling:
+
+```text
+Numerical Features (Time, V1–V28, Amount)
+                  ↓
+          Median Imputation
+                  ↓
+            Robust Scaling
+```
+
+```python
+numeric_pipeline = Pipeline([
+    ("imputer", SimpleImputer(strategy="median")),
+    ("scaler", RobustScaler())
+])
+```
+
+---
+
+## 2.1 Median Imputation
+
+```python
+SimpleImputer(strategy="median")
+```
+
+Missing numerical values are replaced with the **median** of the corresponding feature.
+
+Median imputation is useful because it is less affected by extreme values than mean imputation.
+
+For example:
+
+```text
+Values:
+10, 12, 15, 20, 500
+
+Median = 15
+```
+
+If a value is missing, it can be replaced with `15`.
+
+---
+
+## 2.2 Robust Scaling
+
+```python
+RobustScaler()
+```
+
+RobustScaler scales numerical features using statistics based on the **median and interquartile range (IQR)**.
+
+It is particularly useful when the dataset contains outliers (such as extreme transaction amounts).
+
+Unlike standard scaling, RobustScaler is less sensitive to extreme observations.
+
+---
+
+# 3. ColumnTransformer
+
+The preprocessing pipeline is wrapped using `ColumnTransformer`:
+
+```python
+preprocessor = ColumnTransformer([
+    ("num", numeric_pipeline, numeric_cols)
+])
+```
+
+This allows the model to process all numerical features consistently within a single pipeline.
+
+---
+
+# 4. Train-Test Split
+
+The dataset is divided into training and testing sets.
+
+```python
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+```
+
+The dataset is divided into:
+
+* **80% Training Data**
+* **20% Testing Data**
+
+### `random_state=42`
+
+Ensures that the same split can be reproduced.
+
+### `stratify=y`
+
+This is especially important for fraud detection.
+
+Because fraudulent transactions are much less frequent than legitimate transactions, stratification attempts to preserve the class distribution in both training and testing sets.
+
+---
+
+# 5. Baseline Machine Learning Models
+
+Six different classification algorithms are evaluated:
+
+```text
+Logistic Regression
+Decision Tree
+Random Forest
+XGBoost
+LightGBM
+CatBoost
+```
+
+The purpose is to compare different machine learning approaches rather than relying on a single algorithm.
+
+---
+
+# 6. Logistic Regression
+
+```python
+LogisticRegression(max_iter=1000)
+```
+
+Logistic Regression is a linear classification algorithm.
+
+It estimates the probability that a transaction belongs to a particular class.
+
+In this project:
+
+```text
+0 → Legitimate Transaction
+1 → Fraudulent Transaction
+```
+
+It provides a useful baseline because it is relatively simple and interpretable.
+
+---
+
+# 7. Decision Tree
+
+```python
+DecisionTreeClassifier()
+```
+
+A Decision Tree makes predictions using a sequence of decision rules.
+
+Conceptually:
+
+```text
+Transaction Amount > Threshold?
+          ↓
+       Yes / No
+          ↓
+   Another condition
+          ↓
+     Fraud / Legitimate
+```
+
+Decision Trees can model nonlinear relationships between features.
+
+---
+
+# 8. Random Forest
+
+```python
+RandomForestClassifier(
+    n_estimators=200,
+    random_state=42,
+    class_weight="balanced"
+)
+```
+
+Random Forest is an ensemble of multiple Decision Trees.
+
+Each tree produces a prediction, and the trees are combined to produce the final prediction.
+
+### Important Parameters
+
+* `n_estimators=200` → Creates 200 decision trees.
+* `class_weight="balanced"` → Assigns greater importance to the minority class based on class frequencies.
+
+---
+
+# 9. XGBoost
+
+```python
+XGBClassifier(
+    n_estimators=300,
+    max_depth=5,
+    learning_rate=0.05,
+    eval_metric="logloss",
+    random_state=42
+)
+```
+
+XGBoost is a gradient boosting algorithm that builds trees sequentially.
+
+Each new tree attempts to improve the errors made by previous trees.
+
+Important parameters include:
+
+* `n_estimators` → number of boosting trees
+* `max_depth` → maximum tree depth
+* `learning_rate` → contribution of each tree
+* `eval_metric` → evaluation metric used during training
+
+---
+
+# 10. LightGBM
+
+```python
+LGBMClassifier(
+    n_estimators=300,
+    learning_rate=0.05,
+    class_weight="balanced"
+)
+```
+
+LightGBM is another gradient boosting framework designed for efficient and scalable tree-based learning.
+
+It uses a leaf-wise tree growth strategy and can perform well on structured/tabular datasets.
+
+`class_weight="balanced"` helps account for the imbalanced target distribution.
+
+---
+
+# 11. CatBoost
+
+```python
+CatBoostClassifier(
+    iterations=300,
+    depth=6,
+    learning_rate=0.05,
+    verbose=0,
+    auto_class_weights="Balanced"
+)
+```
+
+CatBoost is a gradient boosting algorithm with robust regularization and high performance.
+
+Important parameters include:
+
+* `iterations` → number of boosting iterations
+* `depth` → tree depth
+* `learning_rate` → learning rate
+* `auto_class_weights="Balanced"` → automatically adjusts class weights
+
+---
+
+# 12. Model Evaluation
+
+Each model is evaluated using:
+
+```text
+Accuracy
+Precision
+Recall
+F1-Score
+ROC-AUC
+```
+
+---
+
+## 12.1 Accuracy
+
+Accuracy measures the proportion of all predictions that are correct.
+
+```text
+Accuracy = Correct Predictions / Total Predictions
+```
+
+However, accuracy can be misleading for highly imbalanced fraud datasets.
+
+For example, if 99.8% of transactions are legitimate, a model that predicts almost everything as legitimate could achieve very high accuracy while detecting very little fraud.
+
+Therefore, accuracy is not sufficient by itself.
+
+---
+
+## 12.2 Precision
+
+Precision measures how many transactions predicted as fraud are actually fraudulent.
+
+```text
+Precision = TP / (TP + FP)
+```
+
+Where:
+
+* TP = True Positive
+* FP = False Positive
+
+High precision means fewer legitimate transactions are incorrectly flagged as fraud.
+
+---
+
+## 12.3 Recall
+
+Recall measures how many actual fraudulent transactions were successfully detected.
+
+```text
+Recall = TP / (TP + FN)
+```
+
+Where:
+
+* TP = True Positive
+* FN = False Negative
+
+Recall is particularly important in fraud detection because a **False Negative** means that an actual fraudulent transaction was missed.
+
+---
+
+## 12.4 F1-Score
+
+F1-score combines precision and recall.
+
+```text
+F1 = 2 × (Precision × Recall) / (Precision + Recall)
+```
+
+It provides a balance between precision and recall when both false positives and false negatives matter.
+
+---
+
+## 12.5 ROC-AUC
+
+ROC-AUC measures how well the model separates the two classes across different classification thresholds.
+
+The model uses `predict_proba(X_test)[:, 1]` to obtain the predicted probability of the fraud class.
+
+A higher ROC-AUC generally indicates better class discrimination.
+
+---
+
+# 13. Baseline Model Comparison
+
+The trained models are stored and their evaluation results are collected:
+
+```text
+Logistic Regression
+Decision Tree
+Random Forest
+XGBoost
+LightGBM
+CatBoost
+        ↓
+Performance Comparison
+```
+
+The model with the highest F1-score is selected as:
+
+```python
+best_model_name = results_df["f1"].idxmax()
+```
+
+---
+
+# 14. Hyperparameter Optimization
+
+After identifying the best baseline model, `RandomizedSearchCV` is used to search for better hyperparameter combinations.
+
+```python
+RandomizedSearchCV(
+    pipeline,
+    param_grid[best_model_name],
+    n_iter=10,
+    scoring="roc_auc",
+    cv=3,
+    n_jobs=-1,
+    random_state=42
+)
+```
+
+The optimization process uses:
+
+```text
+Parameter Search
+       ↓
+RandomizedSearchCV
+       ↓
+3-Fold Cross-Validation
+       ↓
+10 Random Parameter Combinations
+       ↓
+ROC-AUC Optimization
+       ↓
+Best Hyperparameters
+```
+
+---
+
+# 15. Tuned Best Model
+
+The best hyperparameter configuration is obtained using `search.best_params_`.
+
+The optimized model is stored in:
+
+```python
+best_model = search.best_estimator_
+```
+
+---
+
+# 16. Ensemble Learning
+
+The project uses ensemble learning to combine multiple tree-based models:
+
+```text
+Soft Voting
+Stacking
+```
+
+---
+
+## 16.1 Soft Voting
+
+The `VotingClassifier` combines:
+
+```text
+XGBoost
+LightGBM
+Random Forest
+```
+
+using `voting="soft"`.
+
+Conceptually:
+
+```text
+              ┌── XGBoost ──────┐
+Input ────────┼── LightGBM ─────┼──→ Probability Combination
+              └── RandomForest ─┘
+                         ↓
+                   Final Prediction
+```
+
+Instead of simple hard voting, the ensemble combines their continuous probability estimates.
+
+---
+
+## 16.2 Stacking
+
+Stacking uses several base estimators (`XGBoost`, `Random Forest`, `LightGBM`) passed to a meta-classifier:
+
+```text
+                 XGBoost
+                    │
+                 Random Forest
+                    │
+                 LightGBM
+                    │
+                    ↓
+             Base Predictions
+                    ↓
+          Logistic Regression
+                    ↓
+             Final Prediction
+```
+
+The final estimator learns how to optimally combine the predictions from the base models.
+
+---
+
+# 17. SMOTE-Tomek
+
+The project uses `SMOTETomek(random_state=42)` to address class imbalance:
+
+```text
+SMOTE (Synthetic Minority Over-sampling)
++
+Tomek Links (Boundary Cleaning)
+```
+
+```text
+SMOTE
+   ↓
+Increase Minority Samples
+   ↓
+Tomek Links
+   ↓
+Clean Overlapping Samples
+   ↓
+Balanced Training Data
+```
+
+---
+
+# 18. Final Model Comparison
+
+Four approaches are compared:
+
+```text
+Best Tuned Model
+Voting
+Stacking
+SMOTE-Tomek Model
+```
+
+The results are organized into a DataFrame and sorted according to ROC-AUC:
+
+```python
+pd.DataFrame(final_results).T.sort_values("roc_auc", ascending=False)
+```
+
+---
+
+# 19. Final Model
+
+The final model in the code is explicitly assigned as:
+
+```python
+best_final_model = voting_pipe
+```
+
+Therefore, the **Voting ensemble is used as the final prediction model** in the subsequent confusion-matrix step:
+
+```text
+XGBoost + LightGBM + Random Forest
+              ↓
+         Soft Voting
+              ↓
+    Final Fraud Prediction
+```
+
+---
+
+# 20. Confusion Matrix
+
+The final model predictions are evaluated using a confusion matrix:
+
+```python
+cm = confusion_matrix(y_test, y_pred)
+```
+
+```text
+                    Predicted
+                 Legitimate   Fraud
+Actual
+Legitimate           TN         FP
+Fraud                FN         TP
+```
+
+* **True Negative (TN):** Legitimate transaction correctly classified as legitimate.
+* **False Positive (FP):** Legitimate transaction incorrectly flagged as fraud.
+* **False Negative (FN):** Fraudulent transaction incorrectly missed as legitimate.
+* **True Positive (TP):** Fraudulent transaction correctly detected as fraud.
+
+---
+
+# 21. SHAP Explainability
+
+The project uses **SHAP (SHapley Additive exPlanations)** with `TreeExplainer` on the trained model to interpret individual and global feature contributions:
+
+```python
+best_shap_model = trained_models["LightGBM"]
+light_model = best_shap_model.named_steps["model"]
+explainer = shap.TreeExplainer(light_model)
+shap_values = explainer.shap_values(X_transformed)
+```
+
+---
+
+# Complete Architecture
+
+```text
+                         CREDIT CARD DATASET
+                                │
+                                ▼
+                         ARFF DATA LOADING
+                                │
+                                ▼
+                       PANDAS DATAFRAME
+                                │
+                                ▼
+                       NUMERICAL FEATURES
+                     (Time, V1–V28, Amount)
+                                │
+                                ▼
+                        MEDIAN IMPUTATION
+                                │
+                                ▼
+                         ROBUST SCALING
+                                │
+                                ▼
+                           PREPROCESSOR
+                                │
+                                ▼
+                       TRAIN-TEST SPLIT
+                         /            \
+                        /              \
+                   80% TRAIN         20% TEST
+                        │
+                        ▼
+                 BASELINE MODELS
+                        │
+        ┌───────────────┼────────────────┐
+        │               │                │
+        ▼               ▼                ▼
+ Logistic Regression  Decision Tree   Random Forest
+        │
+        ├──────── XGBoost
+        │
+        ├──────── LightGBM
+        │
+        └──────── CatBoost
+                        │
+                        ▼
+                  MODEL EVALUATION
+                        │
+          ┌─────────────┼──────────────┐
+          ▼             ▼              ▼
+      Precision       Recall        F1-Score
+          │             │              │
+          └─────────────┼──────────────┘
+                        │
+                     ROC-AUC
+                        │
+                        ▼
+                 BEST MODEL SELECTION
+                        │
+                        ▼
+             HYPERPARAMETER OPTIMIZATION
+                        │
+                 RandomizedSearchCV
+                        │
+                 3-Fold Cross Validation
+                        │
+                        ▼
+                  TUNED BEST MODEL
+                        │
+             ┌──────────┴──────────┐
+             │                     │
+             ▼                     ▼
+        SOFT VOTING             STACKING
+             │                     │
+      XGBoost                    XGBoost
+      LightGBM                   Random Forest
+      Random Forest              LightGBM
+             │                     │
+             │              Logistic Regression
+             │                     │
+             └──────────┬──────────┘
+                        │
+                        ▼
+                  SMOTE-TOMEK
+                        │
+                        ▼
+              FINAL MODEL COMPARISON
+                        │
+                        ▼
+                  FINAL MODEL
+                        │
+                        ▼
+                 CONFUSION MATRIX
+                        │
+                        ▼
+                SHAP EXPLAINABILITY
+                        │
+                        ▼
+               FEATURE IMPORTANCE
+               & MODEL EXPLANATION
+```
+
+# Technologies Used
 
 * Python
-* Pandas
 * NumPy
+* Pandas
+* SciPy
 * Scikit-learn
 * Imbalanced-learn
 * XGBoost
@@ -684,30 +755,71 @@ Final Conclusions
 * SHAP
 * Matplotlib
 * Joblib
-* SciPy
 
----
+# Key Techniques
 
-# 23. Project Objective
+* Numerical data preprocessing
+* Missing-value median imputation
+* Robust scaling (outlier-resistant)
+* Stratified train-test splitting
+* Multiple machine learning classifiers
+* Hyperparameter optimization
+* RandomizedSearchCV & Cross-validation
+* Ensemble learning (Soft Voting & Stacking)
+* SMOTE-Tomek class balancing
+* Confusion matrix analysis
+* SHAP explainability & feature importance
 
-The primary objectives of this project are:
+# Evaluation Strategy
 
-1. Detect fraudulent credit card transactions.
-2. Address the severe class imbalance problem.
-3. Compare multiple machine learning algorithms.
-4. Optimize the selected model.
-5. Investigate ensemble learning using Voting and Stacking.
-6. Evaluate models using fraud-detection-oriented metrics.
-7. Explain model predictions using SHAP.
-8. Identify important features contributing to fraud detection.
-9. Develop a reliable and interpretable machine learning pipeline.
+Because credit card fraud detection is highly imbalanced, the project does not rely only on accuracy.
 
----
+The main evaluation metrics are:
 
-# 24. Conclusion
+```text
+Accuracy
+Precision
+Recall
+F1-Score
+ROC-AUC
+```
 
-This project develops a complete machine learning framework for credit card fraud detection by combining data preprocessing, exploratory analysis, class imbalance handling, machine learning, cross-validation, hyperparameter optimization, ensemble learning, and explainable AI.
+# Explainable AI
 
-The methodology emphasizes **Precision, Recall, F1-Score, ROC-AUC, and PR-AUC** rather than relying solely on accuracy. The use of SHAP further provides interpretability by showing how features influence fraud predictions.
+SHAP is incorporated to make the machine learning model transparent and interpretable:
 
-The final model is selected using training-data validation and is evaluated only once on the untouched test set to provide an unbiased estimate of final performance.
+* Identifies which features drive predictions.
+* Pinpoints factors pushing transactions toward fraud vs. legitimate classifications.
+* Provides feature attribution rankings for regulatory compliance and auditing.
+
+# Final Workflow
+
+```text
+Data Collection
+      ↓
+Data Preprocessing (Median Imputation + Robust Scaling)
+      ↓
+Train-Test Split
+      ↓
+Baseline Model Training
+      ↓
+Model Evaluation
+      ↓
+Best Model Selection
+      ↓
+Hyperparameter Optimization
+      ↓
+Ensemble Learning
+      ↓
+SMOTE-Tomek
+      ↓
+Final Model Comparison
+      ↓
+Final Model Selection
+      ↓
+Confusion Matrix
+      ↓
+SHAP Explainability
+      ↓
+Fraud Detection + Model Interpretation
+```
