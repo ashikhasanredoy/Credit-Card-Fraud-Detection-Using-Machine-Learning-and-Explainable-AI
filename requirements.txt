@@ -1,0 +1,13 @@
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.7.0
+streamlit>=1.30.0
+scikit-learn
+imbalanced-learn
+xgboost
+lightgbm
+catboost
+pandas
+numpy
+joblib
+requests

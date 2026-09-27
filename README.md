@@ -784,6 +784,29 @@ F1-Score
 ROC-AUC
 ```
 
+---
+
+# Decision Threshold & Fraud Sensitivity
+
+Machine learning classifiers calculate a continuous probability score $P(\text{Fraud}) \in [0.0, 1.0]$ for each transaction. The **Decision Threshold** (Fraud Sensitivity) is the cutoff boundary used to classify a transaction as **FRAUD** vs. **LEGITIMATE**:
+
+$$\text{Predicted Class} = \begin{cases} \text{FRAUD (1)}, & \text{if } P(\text{Fraud}) \ge \text{Threshold} \\ \text{LEGITIMATE (0)}, & \text{if } P(\text{Fraud}) < \text{Threshold} \end{cases}$$
+
+```text
+       0.0 ─────────────────── [ Threshold ] ─────────────────── 1.0
+             Legitimate                      Fraudulent
+```
+
+### Impact on Fraud Predictions:
+
+| Threshold Adjustment | Operational Impact | Metric Trade-off | Business Context |
+| :--- | :--- | :--- | :--- |
+| **Lower Threshold**<br>*(e.g., 0.20 – 0.35)*<br>**High Sensitivity** | Catches more fraud attempts; flags borderline suspicious transactions. | **High Recall (Sensitivity)**<br>Lower Precision (More False Positives) | Used for high-value transactions, cross-border payments, or strict fraud prevention policies where missing a fraud is costlier than a manual review. |
+| **Default Threshold**<br>*(0.50)* | Standard balanced classification boundary. | Balanced Precision & Recall | Standard baseline across machine learning libraries. |
+| **Higher Threshold**<br>*(e.g., 0.65 – 0.85)*<br>**Low Sensitivity** | Flags transactions only when confidence is extremely high; minimizes false alarms. | **High Precision**<br>Lower Recall (More False Negatives) | Used when false declines directly harm user checkout conversion or customer trust (e.g., instant micro-payments). |
+
+---
+
 # Explainable AI
 
 SHAP is incorporated to make the machine learning model transparent and interpretable:

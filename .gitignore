@@ -1,9 +1,11 @@
-# Large data files
-*.arff
-*.csv
-
-# Cache and temporary folders
-catboost_info/
-.ipynb_checkpoints/
+# Compiled model and cache
+*.pkl
 __pycache__/
+*.pyc
 .DS_Store
+.ipynb_checkpoints/
+catboost_info/
+
+# Internal working files
+app_api.py
+app_streamlit.py
