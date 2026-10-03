@@ -1,5 +1,6 @@
 # Compiled model and cache
 *.pkl
+!best_fraud_model.pkl
 __pycache__/
 *.pyc
 .DS_Store
@@ -9,3 +10,9 @@ catboost_info/
 # Internal working files
 app_api.py
 app_streamlit.py
+
+# Images
+*.jpg
+*.jpeg
+*.png
+

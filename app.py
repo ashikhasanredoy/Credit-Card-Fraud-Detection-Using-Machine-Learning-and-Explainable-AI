@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -58,7 +59,7 @@ st.markdown("""
 
 MODEL_DIR = Path(__file__).resolve().parent
 MODEL_PATH = MODEL_DIR / "best_fraud_model.pkl"
-DEFAULT_API_URL = "http://127.0.0.1:8000"
+DEFAULT_API_URL = os.environ.get("API_URL", "http://127.0.0.1:8003")
 
 # Cached model loader for direct in-process fallback
 @st.cache_resource
@@ -85,8 +86,12 @@ api_online = False
 try:
     res = requests.get(f"{api_url}/", timeout=1.5)
     if res.status_code == 200:
-        api_online = True
-        st.sidebar.success("FastAPI Backend: Connected")
+        data = res.json()
+        if isinstance(data, dict) and data.get("service") == "Credit Card Fraud Detection API":
+            api_online = True
+            st.sidebar.success("FastAPI Backend: Connected")
+        else:
+            st.sidebar.warning("FastAPI Backend: Connected to non-fraud service")
     else:
         st.sidebar.warning("FastAPI Backend: Unexpected response")
 except Exception:
