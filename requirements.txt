@@ -2,13 +2,13 @@ fastapi>=0.110.0
 uvicorn>=0.28.0
 pydantic>=2.7.0
 streamlit>=1.30.0
-scikit-learn==1.5.2
-imbalanced-learn==0.12.4
+scikit-learn>=1.5.0
+imbalanced-learn
 xgboost
 lightgbm
 catboost
 pandas
-numpy<2.0.0
 joblib
 requests
+
 
