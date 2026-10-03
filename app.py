@@ -66,6 +66,18 @@ DEFAULT_API_URL = os.environ.get("API_URL", "http://127.0.0.1:8003")
 def load_local_model():
     if MODEL_PATH.exists():
         try:
+            # Compatibility fix for scikit-learn version differences during unpickling
+            try:
+                import sklearn.compose._column_transformer as _ct
+                from collections import UserList
+                if not hasattr(_ct, "_RemainderColsList"):
+                    class _RemainderColsList(UserList):
+                        def __init__(self, columns=(), **kwargs):
+                            super().__init__(columns)
+                    _ct._RemainderColsList = _RemainderColsList
+            except Exception:
+                pass
+
             return joblib.load(MODEL_PATH)
         except Exception as e:
             st.error(f"Error loading local model: {e}")

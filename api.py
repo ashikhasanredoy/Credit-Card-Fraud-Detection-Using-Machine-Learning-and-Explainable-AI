@@ -26,6 +26,17 @@ MODEL_DIR = Path(__file__).resolve().parent
 MODEL_PATH = MODEL_DIR / "best_fraud_model.pkl"
 
 try:
+    try:
+        import sklearn.compose._column_transformer as _ct
+        from collections import UserList
+        if not hasattr(_ct, "_RemainderColsList"):
+            class _RemainderColsList(UserList):
+                def __init__(self, columns=(), **kwargs):
+                    super().__init__(columns)
+            _ct._RemainderColsList = _RemainderColsList
+    except Exception:
+        pass
+
     model = joblib.load(MODEL_PATH)
     print(f"✅ Successfully loaded model from: {MODEL_PATH}")
 except Exception as e:
