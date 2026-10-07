@@ -25,6 +25,38 @@ app.add_middleware(
 MODEL_DIR = Path(__file__).resolve().parent
 MODEL_PATH = MODEL_DIR / "best_fraud_model.pkl"
 
+def patch_sklearn_estimator(estimator):
+    """Recursively patch deserialized scikit-learn estimators for cross-version compatibility."""
+    if estimator is None:
+        return estimator
+    
+    if hasattr(estimator, 'statistics_') and not hasattr(estimator, '_fill_dtype'):
+        fit_dtype = getattr(estimator, '_fit_dtype', getattr(estimator.statistics_, 'dtype', np.float64))
+        setattr(estimator, '_fill_dtype', fit_dtype)
+        
+    if hasattr(estimator, 'steps'):
+        for _, step in estimator.steps:
+            patch_sklearn_estimator(step)
+            
+    if hasattr(estimator, 'transformers_'):
+        for item in estimator.transformers_:
+            if len(item) >= 2:
+                patch_sklearn_estimator(item[1])
+                
+    if hasattr(estimator, 'named_steps'):
+        for _, step in estimator.named_steps.items():
+            patch_sklearn_estimator(step)
+            
+    if hasattr(estimator, 'estimators_'):
+        for est in estimator.estimators_:
+            patch_sklearn_estimator(est)
+            
+    if hasattr(estimator, 'named_estimators_'):
+        for _, est in estimator.named_estimators_.items():
+            patch_sklearn_estimator(est)
+            
+    return estimator
+
 try:
     try:
         import sklearn.compose._column_transformer as _ct
@@ -37,7 +69,8 @@ try:
     except Exception:
         pass
 
-    model = joblib.load(MODEL_PATH)
+    loaded_model = joblib.load(MODEL_PATH)
+    model = patch_sklearn_estimator(loaded_model)
     print(f"✅ Successfully loaded model from: {MODEL_PATH}")
 except Exception as e:
     print(f"⚠️ Error loading model: {e}")

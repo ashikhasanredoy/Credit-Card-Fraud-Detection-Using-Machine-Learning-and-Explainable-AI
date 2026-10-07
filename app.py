@@ -61,6 +61,43 @@ MODEL_DIR = Path(__file__).resolve().parent
 MODEL_PATH = MODEL_DIR / "best_fraud_model.pkl"
 DEFAULT_API_URL = os.environ.get("API_URL", "http://127.0.0.1:8003")
 
+def patch_sklearn_estimator(estimator):
+    """Recursively patch deserialized scikit-learn estimators for cross-version compatibility."""
+    if estimator is None:
+        return estimator
+    
+    # Fix for SimpleImputer in scikit-learn >= 1.6 missing _fill_dtype
+    if hasattr(estimator, 'statistics_') and not hasattr(estimator, '_fill_dtype'):
+        fit_dtype = getattr(estimator, '_fit_dtype', getattr(estimator.statistics_, 'dtype', np.float64))
+        setattr(estimator, '_fill_dtype', fit_dtype)
+        
+    # Recurse into Pipeline steps
+    if hasattr(estimator, 'steps'):
+        for _, step in estimator.steps:
+            patch_sklearn_estimator(step)
+            
+    # Recurse into ColumnTransformer
+    if hasattr(estimator, 'transformers_'):
+        for item in estimator.transformers_:
+            if len(item) >= 2:
+                patch_sklearn_estimator(item[1])
+                
+    # Recurse into named_steps
+    if hasattr(estimator, 'named_steps'):
+        for _, step in estimator.named_steps.items():
+            patch_sklearn_estimator(step)
+            
+    # Recurse into Voting / Ensemble estimators
+    if hasattr(estimator, 'estimators_'):
+        for est in estimator.estimators_:
+            patch_sklearn_estimator(est)
+            
+    if hasattr(estimator, 'named_estimators_'):
+        for _, est in estimator.named_estimators_.items():
+            patch_sklearn_estimator(est)
+            
+    return estimator
+
 # Cached model loader for direct in-process fallback
 @st.cache_resource
 def load_local_model():
@@ -78,7 +115,8 @@ def load_local_model():
             except Exception:
                 pass
 
-            return joblib.load(MODEL_PATH)
+            loaded = joblib.load(MODEL_PATH)
+            return patch_sklearn_estimator(loaded)
         except Exception as e:
             st.error(f"Error loading local model: {e}")
             return None
