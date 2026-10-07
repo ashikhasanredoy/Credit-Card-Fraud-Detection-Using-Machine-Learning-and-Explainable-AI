@@ -1,0 +1,31 @@
+LogisticRegression:
+  model__C: [0.01, 0.1, 1]
+  model__solver: ["lbfgs", "liblinear"]
+  model__class_weight: ["balanced"]
+
+DecisionTree:
+  model__max_depth: [10, 15, 20]
+  model__min_samples_split: [2, 5, 10]
+  model__min_samples_leaf: [1, 2, 5]
+  model__class_weight: ["balanced"]
+
+RandomForest:
+  model__n_estimators: [100, 200, 300]
+  model__max_depth: [10, 15, 20]
+  model__min_samples_split: [2, 5, 10]
+  model__class_weight: ["balanced"]
+
+XGBoost:
+  model__n_estimators: [100, 200, 300]
+  model__max_depth: [3, 5, 7]
+  model__learning_rate: [0.01, 0.05, 0.1]
+
+LightGBM:
+  model__n_estimators: [100, 200, 300]
+  model__learning_rate: [0.01, 0.05, 0.1]
+  model__num_leaves: [31, 50, 100]
+
+CatBoost:
+  model__iterations: [100, 200, 300]
+  model__depth: [4, 6, 8]
+  model__learning_rate: [0.01, 0.05, 0.1]

@@ -1,0 +1,23 @@
+project:
+  name: fraud-detection-research
+  version: 1.0.0
+
+seed: 42
+test_size: 0.2
+target_column: Class
+
+paths:
+  data_raw: data/raw/dataset.arff
+  data_processed: data/processed/eda.csv
+  models_dir: models
+  best_model_path: models/best_fraud_model.pkl
+  figures_dir: reports/figures
+  boxplots_dir: reports/figures/boxplots
+  tables_dir: reports/tables
+  predictions_dir: outputs/predictions
+  submissions_dir: outputs/submissions
+  logs_dir: logs
+
+visualization:
+  dpi: 300
+  style: default

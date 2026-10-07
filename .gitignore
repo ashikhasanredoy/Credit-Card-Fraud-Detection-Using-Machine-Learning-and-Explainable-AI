@@ -1,0 +1,31 @@
+# Dependencies
+*.pyc
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Data & Large Artifacts
+data/raw/*.arff
+data/processed/*.csv
+!data/README.md
+outputs/predictions/*.csv
+outputs/submissions/*.csv
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/*
+!logs/.gitkeep
