@@ -78,6 +78,31 @@ def test_stratified_split() -> None:
     assert (y_train == 1).sum() == 8
 
 
+def test_stratified_train_val_test_split() -> None:
+    """Test 70/15/15 stratified train/val/test split."""
+    from src.data.preprocess import stratified_train_val_test_split
+
+    X = pd.DataFrame({"feat1": np.arange(200), "feat2": np.arange(200)})
+    y = pd.Series([0] * 180 + [1] * 20)
+
+    X_train, X_val, X_test, y_train, y_val, y_test = stratified_train_val_test_split(
+        X, y, train_size=0.70, val_size=0.15, test_size=0.15, random_state=42
+    )
+
+    # 70% of 200 = 140, 15% of 200 = 30, 15% of 200 = 30
+    assert len(X_train) == 140
+    assert len(X_val) == 30
+    assert len(X_test) == 30
+
+    # Total preserved
+    assert len(X_train) + len(X_val) + len(X_test) == 200
+
+    # Stratification preserved
+    assert (y_train == 1).sum() == 14
+    assert (y_val == 1).sum() == 3
+    assert (y_test == 1).sum() == 3
+
+
 def test_get_numeric_categorical_columns() -> None:
     """Test identifying numerical and categorical features."""
     df = pd.DataFrame(
@@ -91,3 +116,21 @@ def test_get_numeric_categorical_columns() -> None:
     num_cols, cat_cols = get_numeric_categorical_columns(df)
     assert set(num_cols) == {"num1", "num2"}
     assert set(cat_cols) == {"cat1", "cat2"}
+
+
+def test_upsample_minority_class() -> None:
+    """Test upsampling minority class from small count to target count."""
+    from src.data.preprocess import upsample_minority_class
+
+    X = pd.DataFrame(np.random.randn(50, 4), columns=["V1", "V2", "V3", "V4"])
+    y = pd.Series([0] * 40 + [1] * 10)
+
+    X_upsampled, y_upsampled = upsample_minority_class(
+        X, y, target_minority_count=30, random_state=42
+    )
+
+    assert len(X_upsampled) == 70  # 40 majority + 30 minority
+    assert (y_upsampled == 0).sum() == 40
+    assert (y_upsampled == 1).sum() == 30
+
+

@@ -1,0 +1,72 @@
+{
+    "LogisticRegression": {
+        "accuracy": 0.9985952730939612,
+        "precision": 0.9355203619909502,
+        "recall": 0.7876190476190477,
+        "f1": 0.8552223371251293,
+        "roc_auc": 0.9915102849140585
+    },
+    "DecisionTree": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+    },
+    "RandomForest": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+    },
+    "XGBoost": {
+        "accuracy": 0.9998846117184326,
+        "precision": 0.9990281827016521,
+        "recall": 0.979047619047619,
+        "f1": 0.9889369889369889,
+        "roc_auc": 0.9999962150113706
+    },
+    "LightGBM": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+    },
+    "CatBoost": {
+        "accuracy": 0.9995434637555374,
+        "precision": 0.9202453987730062,
+        "recall": 1.0,
+        "f1": 0.9584664536741214,
+        "roc_auc": 0.9999522553464766
+    },
+    "Best_Tuned": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+    },
+    "Voting": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+    },
+    "Stacking": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+    },
+    "SMOTE": {
+        "accuracy": 0.9999949831181927,
+        "precision": 0.9990485252140818,
+        "recall": 1.0,
+        "f1": 0.9995240361732508,
+        "roc_auc": 0.9999999951967149
+    }
+}

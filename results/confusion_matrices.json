@@ -1,0 +1,33 @@
+{
+    "best_model": "Voting",
+    "train_confusion_matrix": [
+        [
+            198277,
+            0
+        ],
+        [
+            0,
+            1050
+        ]
+    ],
+    "val_confusion_matrix": [
+        [
+            42480,
+            8
+        ],
+        [
+            13,
+            212
+        ]
+    ],
+    "test_confusion_matrix": [
+        [
+            42482,
+            6
+        ],
+        [
+            23,
+            202
+        ]
+    ]
+}

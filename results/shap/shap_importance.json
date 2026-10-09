@@ -1,0 +1,62 @@
+[
+    {
+        "Feature": "num__V14",
+        "Importance": 4.169178770385342
+    },
+    {
+        "Feature": "num__V4",
+        "Importance": 1.2829667436218113
+    },
+    {
+        "Feature": "num__V12",
+        "Importance": 1.2720107790165807
+    },
+    {
+        "Feature": "num__V10",
+        "Importance": 1.013723273992315
+    },
+    {
+        "Feature": "num__V3",
+        "Importance": 0.6208049357383472
+    },
+    {
+        "Feature": "num__V1",
+        "Importance": 0.5598477206942735
+    },
+    {
+        "Feature": "num__V11",
+        "Importance": 0.44960358809761375
+    },
+    {
+        "Feature": "num__V8",
+        "Importance": 0.4131360745522303
+    },
+    {
+        "Feature": "num__V7",
+        "Importance": 0.38261896153057323
+    },
+    {
+        "Feature": "num__V17",
+        "Importance": 0.361808402445114
+    },
+    {
+        "Feature": "num__V16",
+        "Importance": 0.2819161165570346
+    },
+    {
+        "Feature": "num__V18",
+        "Importance": 0.2791572673798536
+    },
+    {
+        "Feature": "num__Time",
+        "Importance": 0.23004878236172574
+    },
+    {
+        "Feature": "num__V22",
+        "Importance": 0.211446804823727
+    },
+    {
+        "Feature": "num__V26",
+        "Importance": 0.19727975181266597
+    }
+]

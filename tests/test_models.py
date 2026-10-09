@@ -90,3 +90,50 @@ def test_ensemble_pipelines() -> None:
     smote_pipe.fit(X_train, y_train)
     smote_preds = smote_pipe.predict(X_train)
     assert len(smote_preds) == n_samples
+
+
+def test_train_and_evaluate_all_splits() -> None:
+    """Test train_and_evaluate_all_splits returns metrics for train, val, and test splits."""
+    from src.models.train import train_and_evaluate_all_splits
+
+    np.random.seed(42)
+    X_train = pd.DataFrame(np.random.randn(30, 3), columns=["V1", "V2", "V3"])
+    y_train = pd.Series([0] * 25 + [1] * 5)
+    X_val = pd.DataFrame(np.random.randn(15, 3), columns=["V1", "V2", "V3"])
+    y_val = pd.Series([0] * 12 + [1] * 3)
+    X_test = pd.DataFrame(np.random.randn(15, 3), columns=["V1", "V2", "V3"])
+    y_test = pd.Series([0] * 12 + [1] * 3)
+
+    preprocessor = build_preprocessor(["V1", "V2", "V3"])
+    models = {"LogisticRegression": build_models()["LogisticRegression"]}
+
+    trained, train_s, val_s, test_s = train_and_evaluate_all_splits(
+        models, preprocessor, X_train, y_train, X_val, y_val, X_test, y_test
+    )
+
+    assert "LogisticRegression" in trained
+    assert "LogisticRegression" in train_s
+    assert "LogisticRegression" in val_s
+    assert "LogisticRegression" in test_s
+
+    for metric_dict in [train_s["LogisticRegression"], val_s["LogisticRegression"], test_s["LogisticRegression"]]:
+        assert "f1" in metric_dict
+        assert "roc_auc" in metric_dict
+        assert "precision" in metric_dict
+        assert "recall" in metric_dict
+        assert "accuracy" in metric_dict
+
+
+def test_logger_setup(tmp_path) -> None:
+    """Test logger writes output to specified log file."""
+    from src.utils.logger import setup_logger
+
+    log_dir = tmp_path / "logs"
+    logger = setup_logger(name="test_logger", log_dir=log_dir, log_file="test.log")
+    test_msg = "Fraud detection test message"
+    logger.info(test_msg)
+
+    log_file = log_dir / "test.log"
+    assert log_file.exists()
+    assert test_msg in log_file.read_text(encoding="utf-8")
+

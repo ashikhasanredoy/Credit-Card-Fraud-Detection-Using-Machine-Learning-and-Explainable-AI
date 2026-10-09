@@ -1,0 +1,11 @@
+=== MODEL: Voting (TEST SET) ===
+
+              precision    recall  f1-score   support
+
+           0     0.9995    0.9999    0.9997     42488
+           1     0.9712    0.8978    0.9330       225
+
+    accuracy                         0.9993     42713
+   macro avg     0.9853    0.9488    0.9663     42713
+weighted avg     0.9993    0.9993    0.9993     42713
+

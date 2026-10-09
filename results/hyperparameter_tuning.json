@@ -1,0 +1,8 @@
+{
+    "best_base_model": "LightGBM",
+    "best_hyperparameters": {
+        "model__num_leaves": "31",
+        "model__n_estimators": "300",
+        "model__learning_rate": "0.1"
+    }
+}

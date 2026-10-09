@@ -1,0 +1,11 @@
+=== MODEL: Voting (VALIDATION SET) ===
+
+              precision    recall  f1-score   support
+
+           0     0.9997    0.9998    0.9998     42488
+           1     0.9636    0.9422    0.9528       225
+
+    accuracy                         0.9995     42713
+   macro avg     0.9817    0.9710    0.9763     42713
+weighted avg     0.9995    0.9995    0.9995     42713
+

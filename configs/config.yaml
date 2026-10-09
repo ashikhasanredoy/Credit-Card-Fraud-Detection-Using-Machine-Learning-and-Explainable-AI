@@ -3,14 +3,18 @@ project:
   version: 1.0.0
 
 seed: 42
-test_size: 0.2
+train_size: 0.70
+val_size: 0.15
+test_size: 0.15
+target_fraud_count: 1500
 target_column: Class
 
 paths:
   data_raw: data/raw/dataset.arff
   data_processed: data/processed/eda.csv
   models_dir: models
-  best_model_path: models/best_fraud_model.pkl
+  model_path: models/model2.pkl
+  results_dir: results
   figures_dir: reports/figures
   boxplots_dir: reports/figures/boxplots
   tables_dir: reports/tables

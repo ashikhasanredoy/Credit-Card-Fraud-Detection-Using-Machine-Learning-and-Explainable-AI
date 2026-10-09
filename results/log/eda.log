@@ -1,0 +1,25 @@
+2026-10-09 19:21:45 | INFO     | [eda.py:63] | ============================================================
+2026-10-09 19:21:45 | INFO     | [eda.py:64] | Starting Exploratory Data Analysis (EDA) Pipeline
+2026-10-09 19:21:45 | INFO     | [eda.py:65] | ============================================================
+2026-10-09 19:21:45 | INFO     | [eda.py:67] | Loading raw dataset from /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./data/raw/dataset.arff...
+2026-10-09 19:21:55 | INFO     | [eda.py:69] | Raw dataset shape: (284807, 31)
+2026-10-09 19:21:55 | INFO     | [eda.py:71] | Decoding byte string columns...
+2026-10-09 19:21:55 | INFO     | [eda.py:74] | Removing duplicate records...
+2026-10-09 19:21:55 | INFO     | [eda.py:76] | Shape after removing duplicates: (283726, 31)
+2026-10-09 19:21:55 | INFO     | [eda.py:78] | Target 'Class' class counts:
+Class
+0.0    283253
+1.0       473
+Name: count, dtype: int64
+2026-10-09 19:21:55 | INFO     | [eda.py:79] | Target 'Class' class proportions:
+Class
+0.0    0.998333
+1.0    0.001667
+Name: proportion, dtype: float64
+2026-10-09 19:21:55 | INFO     | [eda.py:84] | Identified 30 numerical features and 0 categorical features.
+2026-10-09 19:21:55 | INFO     | [eda.py:86] | Generating boxplots...
+2026-10-09 19:22:07 | INFO     | [eda.py:89] | Generating class distribution plot...
+2026-10-09 19:22:08 | INFO     | [eda.py:96] | Generating correlation matrix heatmap...
+2026-10-09 19:22:10 | INFO     | [eda.py:102] | Saving cleaned dataset to /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./data/processed/eda.csv...
+2026-10-09 19:22:20 | INFO     | [eda.py:104] | EDA Pipeline completed successfully!
+2026-10-09 19:22:20 | INFO     | [eda.py:105] | ============================================================

@@ -1,0 +1,80 @@
+2026-10-09 19:22:26 | INFO     | [pipeline.py:122] | ======================================================================
+2026-10-09 19:22:26 | INFO     | [pipeline.py:123] | Starting Fraud Detection Modeling & Evaluation Pipeline
+2026-10-09 19:22:26 | INFO     | [pipeline.py:124] | ======================================================================
+2026-10-09 19:22:26 | INFO     | [pipeline.py:125] | Target Fraud Count (Upsampling): 1,500
+2026-10-09 19:22:26 | INFO     | [pipeline.py:126] | Configuration -> Train: 70%, Val: 15%, Test: 15%
+2026-10-09 19:22:26 | INFO     | [pipeline.py:127] | Random State: 42
+2026-10-09 19:22:26 | INFO     | [pipeline.py:128] | Results Directory: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./results
+2026-10-09 19:22:26 | INFO     | [pipeline.py:129] | Train Results Directory: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./results/train
+2026-10-09 19:22:26 | INFO     | [pipeline.py:130] | Validation Results Directory: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./results/validation
+2026-10-09 19:22:26 | INFO     | [pipeline.py:131] | Test Results Directory: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./results/test
+2026-10-09 19:22:26 | INFO     | [pipeline.py:132] | SHAP Results Directory: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./results/shap
+2026-10-09 19:22:26 | INFO     | [pipeline.py:133] | Logs Directory: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./logs & /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./results/log
+2026-10-09 19:22:26 | INFO     | [pipeline.py:134] | Target Model Save Path: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./models/model2.pkl
+2026-10-09 19:22:26 | INFO     | [pipeline.py:137] | Loading processed dataset from /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./data/processed/eda.csv...
+2026-10-09 19:22:28 | INFO     | [pipeline.py:140] | Dataset successfully loaded. Total rows: 283,726, Total columns: 31
+2026-10-09 19:22:28 | INFO     | [pipeline.py:145] | Original dataset: Legitimate=283,253, Fraud=473
+2026-10-09 19:22:28 | INFO     | [pipeline.py:149] | Upsampling fraud data from 473 to 1,500 samples using SMOTE...
+2026-10-09 19:22:28 | INFO     | [pipeline.py:154] | Upsampling complete. New distribution: Legitimate=283,253, Fraud=1,500
+2026-10-09 19:22:28 | INFO     | [pipeline.py:158] | Constructed ColumnTransformer preprocessor (RobustScaler).
+2026-10-09 19:22:28 | INFO     | [pipeline.py:161] | Executing Stratified Split (Train=70%, Val=15%, Test=15%, random_state=42)...
+2026-10-09 19:22:29 | INFO     | [pipeline.py:178] | Train set: 199,327 samples (Fraud: 1,050, 0.527% | 70.0% of total fraud) | Val set: 42,713 samples (Fraud: 225, 0.527% | 15.0% of total fraud) | Test set: 42,713 samples (Fraud: 225, 0.527% | 15.0% of total fraud)
+2026-10-09 19:22:29 | INFO     | [pipeline.py:191] | 
+--- Training Base Models ---
+2026-10-09 19:22:29 | INFO     | [train.py:164] | Fitting model pipeline: LogisticRegression on training set (N=199327)...
+2026-10-09 19:22:31 | INFO     | [train.py:177] | Evaluated LogisticRegression -> Train F1: 0.8552, Val F1: 0.8558, Test F1: 0.8488
+2026-10-09 19:22:31 | INFO     | [train.py:164] | Fitting model pipeline: DecisionTree on training set (N=199327)...
+2026-10-09 19:22:50 | INFO     | [train.py:177] | Evaluated DecisionTree -> Train F1: 1.0000, Val F1: 0.8565, Test F1: 0.8571
+2026-10-09 19:22:50 | INFO     | [train.py:164] | Fitting model pipeline: RandomForest on training set (N=199327)...
+2026-10-09 19:26:38 | INFO     | [train.py:177] | Evaluated RandomForest -> Train F1: 1.0000, Val F1: 0.9241, Test F1: 0.8995
+2026-10-09 19:26:38 | INFO     | [train.py:164] | Fitting model pipeline: XGBoost on training set (N=199327)...
+2026-10-09 19:26:46 | INFO     | [train.py:177] | Evaluated XGBoost -> Train F1: 0.9889, Val F1: 0.9339, Test F1: 0.9231
+2026-10-09 19:26:46 | INFO     | [train.py:164] | Fitting model pipeline: LightGBM on training set (N=199327)...
+2026-10-09 19:26:58 | INFO     | [train.py:177] | Evaluated LightGBM -> Train F1: 1.0000, Val F1: 0.9621, Test F1: 0.9364
+2026-10-09 19:26:58 | INFO     | [train.py:164] | Fitting model pipeline: CatBoost on training set (N=199327)...
+2026-10-09 19:27:08 | INFO     | [train.py:177] | Evaluated CatBoost -> Train F1: 0.9585, Val F1: 0.9214, Test F1: 0.9270
+2026-10-09 19:27:08 | INFO     | [pipeline.py:210] | Top Base Model by Validation F1: LightGBM (F1=0.9621)
+2026-10-09 19:27:08 | INFO     | [pipeline.py:214] | 
+--- Hyperparameter Optimization for LightGBM ---
+2026-10-09 19:27:08 | INFO     | [tune.py:40] | Starting RandomizedSearchCV tuning: n_iter=10, cv=3, scoring=roc_auc...
+2026-10-09 19:29:20 | INFO     | [tune.py:53] | RandomizedSearchCV completed. Best score: 0.9972
+2026-10-09 19:29:20 | INFO     | [tune.py:54] | Best Parameters: {'model__num_leaves': 31, 'model__n_estimators': 300, 'model__learning_rate': 0.1}
+2026-10-09 19:29:20 | INFO     | [pipeline.py:239] | 
+--- Training & Evaluating Ensemble Models ---
+2026-10-09 19:29:20 | INFO     | [ensemble.py:123] | Fitting Voting Classifier...
+2026-10-09 19:33:03 | INFO     | [ensemble.py:128] | Fitting Stacking Classifier...
+2026-10-09 19:53:02 | INFO     | [ensemble.py:133] | Fitting SMOTE-Tomek Pipeline...
+2026-10-09 19:57:14 | INFO     | [ensemble.py:154] | [Ensemble: Best_Tuned] Train F1: 1.0000 | Val F1: 0.9621, Val ROC-AUC: 0.9964 | Test F1: 0.9455, Test ROC-AUC: 0.9937
+2026-10-09 19:57:25 | INFO     | [ensemble.py:154] | [Ensemble: Voting] Train F1: 1.0000 | Val F1: 0.9528, Val ROC-AUC: 0.9965 | Test F1: 0.9330, Test ROC-AUC: 0.9942
+2026-10-09 19:57:36 | INFO     | [ensemble.py:154] | [Ensemble: Stacking] Train F1: 1.0000 | Val F1: 0.9505, Val ROC-AUC: 0.9965 | Test F1: 0.9371, Test ROC-AUC: 0.9941
+2026-10-09 19:57:42 | INFO     | [ensemble.py:154] | [Ensemble: SMOTE] Train F1: 0.9995 | Val F1: 0.9499, Val ROC-AUC: 0.9975 | Test F1: 0.9208, Test ROC-AUC: 0.9932
+2026-10-09 19:58:16 | INFO     | [pipeline.py:315] | Saved all evaluation scores across train, val, and test to respective folders.
+2026-10-09 19:58:16 | INFO     | [pipeline.py:328] | Selected Best Production Model: Voting
+2026-10-09 19:58:28 | INFO     | [pipeline.py:404] | Validation Confusion Matrix for Voting:
+[[42480, 8], [13, 212]]
+2026-10-09 19:58:28 | INFO     | [pipeline.py:405] | Test Confusion Matrix for Voting:
+[[42482, 6], [23, 202]]
+2026-10-09 19:58:28 | INFO     | [pipeline.py:411] | Successfully serialized model to: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./models/model2.pkl
+2026-10-09 19:58:29 | INFO     | [pipeline.py:416] | Successfully mirrored model to: /Users/macbookpro/iCloud Drive (Archive)/Documents/original research project fraud./models/best_model.pkl
+2026-10-09 19:58:29 | INFO     | [pipeline.py:426] | 
+--- Running SHAP Explainability Analysis ---
+2026-10-09 20:00:24 | INFO     | [pipeline.py:490] | Top 15 SHAP Feature Importances:
+      Feature  Importance
+0    num__V14    4.169179
+1     num__V4    1.282967
+2    num__V12    1.272011
+3    num__V10    1.013723
+4     num__V3    0.620805
+5     num__V1    0.559848
+6    num__V11    0.449604
+7     num__V8    0.413136
+8     num__V7    0.382619
+9    num__V17    0.361808
+10   num__V16    0.281916
+11   num__V18    0.279157
+12  num__Time    0.230049
+13   num__V22    0.211447
+14   num__V26    0.197280
+2026-10-09 20:00:24 | INFO     | [pipeline.py:493] | ======================================================================
+2026-10-09 20:00:24 | INFO     | [pipeline.py:494] | Modeling, Evaluation & SHAP pipeline completed successfully!
+2026-10-09 20:00:24 | INFO     | [pipeline.py:495] | ======================================================================

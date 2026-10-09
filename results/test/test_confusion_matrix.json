@@ -1,0 +1,13 @@
+{
+    "model": "Voting",
+    "confusion_matrix": [
+        [
+            42482,
+            6
+        ],
+        [
+            23,
+            202
+        ]
+    ]
+}

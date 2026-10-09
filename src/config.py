@@ -7,20 +7,31 @@ import numpy as np
 # Project root directory
 PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent
 
-# Reproducibility & Splitting
+# Reproducibility, Splitting & Resampling
 RANDOM_STATE: int = 42
-TEST_SIZE: float = 0.2
+TRAIN_SIZE: float = 0.70
+VAL_SIZE: float = 0.15
+TEST_SIZE: float = 0.15
+TARGET_FRAUD_COUNT: int = 1500
 TARGET_COLUMN: str = "Class"
 
 # Directory & File Paths
 DATA_RAW_PATH: Path = PROJECT_ROOT / "data" / "raw" / "dataset.arff"
 DATA_PROCESSED_PATH: Path = PROJECT_ROOT / "data" / "processed" / "eda.csv"
 MODEL_DIR: Path = PROJECT_ROOT / "models"
-BEST_MODEL_PATH: Path = MODEL_DIR / "best_fraud_model.pkl"
+MODEL_PATH: Path = MODEL_DIR / "model2.pkl"
+MODEL2_PATH: Path = MODEL_DIR / "model2.pkl"
+
+RESULTS_DIR: Path = PROJECT_ROOT / "results"
+RESULTS_TRAIN_DIR: Path = RESULTS_DIR / "train"
+RESULTS_VAL_DIR: Path = RESULTS_DIR / "validation"
+RESULTS_TEST_DIR: Path = RESULTS_DIR / "test"
+RESULTS_SHAP_DIR: Path = RESULTS_DIR / "shap"
+RESULTS_LOGS_DIR: Path = RESULTS_DIR / "log"
 
 REPORTS_DIR: Path = PROJECT_ROOT / "reports"
 FIGURES_DIR: Path = REPORTS_DIR / "figures"
-BOXPLOTS_DIR: FIGURES_DIR / "boxplots"
+BOXPLOTS_DIR: Path = FIGURES_DIR / "boxplots"
 TABLES_DIR: Path = REPORTS_DIR / "tables"
 
 OUTPUTS_DIR: Path = PROJECT_ROOT / "outputs"

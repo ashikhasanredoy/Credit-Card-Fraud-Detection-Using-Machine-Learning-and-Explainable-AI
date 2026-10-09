@@ -5,6 +5,10 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 
+from src.utils.logger import get_logger
+
+logger = get_logger("fraud_detection.tune")
+
 
 def random_search_tune(
     pipeline: Pipeline,
@@ -33,6 +37,9 @@ def random_search_tune(
     Returns:
         Tuple[Any, Dict[str, Any]]: Best estimator pipeline and best parameters dict.
     """
+    logger.info(
+        f"Starting RandomizedSearchCV tuning: n_iter={n_iter}, cv={cv}, scoring={scoring}..."
+    )
     search = RandomizedSearchCV(
         estimator=pipeline,
         param_distributions=param_grid,
@@ -43,5 +50,7 @@ def random_search_tune(
         random_state=random_state,
     )
     search.fit(X_train, y_train)
+    logger.info(f"RandomizedSearchCV completed. Best score: {search.best_score_:.4f}")
+    logger.info(f"Best Parameters: {search.best_params_}")
     print(f"Best Parameters: {search.best_params_}")
     return search.best_estimator_, search.best_params_

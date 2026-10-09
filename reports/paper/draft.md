@@ -14,4 +14,4 @@ With the surge in digital transactions, automated credit card fraud detection re
 - **Explainability**: SHAP TreeExplainer quantifying global and local feature importance.
 
 ## 3. Results
-The soft voting ensemble achieves superior overall discriminative capacity (ROC-AUC: 0.977, F1-Score: 0.866) on unseen test transactions.
+The soft voting ensemble achieves superior overall discriminative capacity (ROC-AUC: 0.9942, F1-Score: 0.9330, Precision: 0.9712, Recall: 0.8978) on unseen holdout test transactions.

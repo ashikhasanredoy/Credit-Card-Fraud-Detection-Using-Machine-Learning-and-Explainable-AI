@@ -75,3 +75,34 @@ def print_confusion_matrix(
     cm = confusion_matrix(y_test, y_pred)
     print("Confusion Matrix:\n", cm)
     return cm
+
+
+def evaluate_splits(
+    model: Any,
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_val: pd.DataFrame,
+    y_val: pd.Series,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+) -> Dict[str, Dict[str, float]]:
+    """Evaluate a fitted pipeline or estimator on train, validation, and test sets.
+
+    Args:
+        model: Fitted estimator or Pipeline.
+        X_train: Training features DataFrame.
+        y_train: Training ground truth series.
+        X_val: Validation features DataFrame.
+        y_val: Validation ground truth series.
+        X_test: Test features DataFrame.
+        y_test: Test ground truth series.
+
+    Returns:
+        Dict[str, Dict[str, float]]: Dictionary containing metrics for 'train', 'val', and 'test'.
+    """
+    return {
+        "train": evaluate_pipeline(model, X_train, y_train),
+        "val": evaluate_pipeline(model, X_val, y_val),
+        "test": evaluate_pipeline(model, X_test, y_test),
+    }
+

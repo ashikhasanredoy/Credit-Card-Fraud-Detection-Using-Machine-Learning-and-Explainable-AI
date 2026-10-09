@@ -69,9 +69,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 MODEL_DIR = Path(__file__).resolve().parent
-MODEL_PATH = MODEL_DIR / "models" / "best_fraud_model.pkl"
-if not MODEL_PATH.exists():
-    MODEL_PATH = MODEL_DIR / "best_fraud_model.pkl"
+MODEL_PATH = MODEL_DIR / "models" / "model2.pkl"
 
 DEFAULT_API_URL = os.environ.get("API_URL", "http://127.0.0.1:8003")
 
@@ -150,6 +148,11 @@ try:
         st.sidebar.warning("FastAPI Backend: Unexpected response")
 except Exception:
     st.sidebar.info("FastAPI Backend: Offline (Using direct in-process inference)")
+
+if local_model is not None:
+    st.sidebar.success(f"Active Model: `{MODEL_PATH.name}`")
+else:
+    st.sidebar.error("Model file not found.")
 
 detection_threshold = st.sidebar.slider(
     "Decision Threshold (Fraud Sensitivity)",
