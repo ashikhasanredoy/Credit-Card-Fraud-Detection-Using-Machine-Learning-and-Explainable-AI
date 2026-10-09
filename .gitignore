@@ -15,9 +15,9 @@ env/
 venv/
 ENV/
 
-# Data & Large Artifacts
-data/raw/*.arff
-data/processed/*.csv
+# Data & Large Artifacts (Raw & Processed tracked via Git LFS)
+!data/raw/dataset.arff
+!data/processed/eda.csv
 !data/README.md
 outputs/predictions/*.csv
 outputs/submissions/*.csv

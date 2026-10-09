@@ -12,8 +12,8 @@ The dataset is highly unbalanced: the positive class (frauds) accounts for only 
 - **Class**: Response variable (1 for fraud, 0 for legitimate transaction).
 
 ## Directory Structure
-- `data/raw/dataset.arff` / `data/raw/dataset.arff.gz`: Complete raw dataset in Attribute-Relation File Format (ARFF, 284,807 transactions). Loaded automatically via `src.data.load_data.load_arff`.
-- `data/processed/eda.csv` / `data/processed/eda.csv.gz`: Cleaned dataset generated after decoding byte strings and removing duplicate records (283,726 transactions). Loaded automatically via `src.data.load_data.load_processed_csv`.
+- `data/raw/dataset.arff`: Complete raw dataset in Attribute-Relation File Format (ARFF, 284,807 transactions) tracked via Git LFS. Loaded automatically via `src.data.load_data.load_arff`.
+- `data/processed/eda.csv`: Cleaned dataset generated after decoding byte strings and removing duplicate records (283,726 transactions) tracked via Git LFS. Loaded automatically via `src.data.load_data.load_processed_csv`.
 - `test_sample_50000.csv` & `test_sample_100000.csv`: Benchmarking test datasets for evaluation.
 
 ## Source & License
